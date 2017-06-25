@@ -443,6 +443,10 @@ span.trip {
   color: #789922;
 }
 
+.rquote {
+  color: #E0727F;
+}
+
 span.omitted {
   display: block;
   margin-top: 1em;
