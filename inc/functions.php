@@ -2363,12 +2363,13 @@ function markup(&$body, $track_cites = false, $op = false) {
 			}
 			
 			
-			// Add in a quote class for >quotes.
+			// Add in a quote class for >quotes and <reverse quotes
+			$quoteClass = "";
 			if (strpos($paragraph, "&gt;")===0) {
-				$quoteClass = "quote";
+				$quoteClass = "quote"; // quote
 			}
-			else {
-				$quoteClass = "";
+			if (strpos($paragraph, "&lt;")===0) {
+				$quoteClass = "rquote"; // reverse quote
 			}
 			
 			// If tags are closed, start a new line.
@@ -2427,6 +2428,7 @@ function markup(&$body, $track_cites = false, $op = false) {
 	}
 	else {
 		$body = preg_replace("/^\s*&gt;.*$/m", '<span class="quote">$0</span>', $body);
+		$body = preg_replace("/^\s*&lt;.*$/m", '<span class="rquote">$0</span>', $body);
 		$body = preg_replace("/\n/", '<br/>', $body);
 	}
 	
