@@ -1593,48 +1593,33 @@ function index($page, $mod=false) {
 }
 
 // Handle statistic tracking for a new post.
-function updateStatisticsForPost( $post, $new = true ) {
-	$identity = getIdentity();
-	$postIp   = $identity;
+function updateStatisticsForPost( $post ) {
 	$postUri  = $post['board'];
 	$postTime = (int)( $post['time'] );
+	$boardStats = array();
 	
-	$bsQuery = prepare("SELECT * FROM ``board_stats`` WHERE `stat_uri` = :uri AND `stat_hour` = :hour");
+	$bsQuery = prepare("SELECT * FROM ``board_stats`` WHERE `stat_uri` = :uri AND `stat_hour` = :hour LIMIT 1");
 	$bsQuery->bindValue(':uri', $postUri);
 	$bsQuery->bindValue(':hour', $postTime, PDO::PARAM_INT);
 	$bsQuery->execute() or error(db_error($bsQuery));
 	$bsResult = $bsQuery->fetchAll(PDO::FETCH_ASSOC);
-	
-	// Flesh out the new stats row.
-	$boardStats = array();
-	
+		
 	// If we already have a row, we're going to be adding this post to it.
 	if (count($bsResult)) {
 		$boardStats = $bsResult[0];
 		$boardStats['stat_uri']          = $postUri;
 		$boardStats['stat_hour']         = $postTime;
-		$boardStats['post_id_array']     = unserialize( $boardStats['post_id_array'] );
-		$boardStats['author_ip_array']   = unserialize( $boardStats['author_ip_array'] );
-		
 		++$boardStats['post_count'];
-		$boardStats['post_id_array'][]   = (int) $post['id'];
-		$boardStats['author_ip_array'][] = less_ip( $postIp );
-		$boardStats['author_ip_array']   = array_unique( $boardStats['author_ip_array'] );
 	}
 	// If this a new row, we're building the stat to only reflect this first post.
 	else {
 		$boardStats['stat_uri']          = $postUri;
 		$boardStats['stat_hour']         = $postTime;
 		$boardStats['post_count']        = 1;
-		$boardStats['post_id_array']     = array( (int) $post['id'] );
-		$boardStats['author_ip_count']   = 1;
-		$boardStats['author_ip_array']   = array( less_ip( $postIp ) );
+		$boardStats['post_id_array']     = ""; // deprecated
+		$boardStats['author_ip_count']   = 1; // deprecated
+		$boardStats['author_ip_array']   = ""; // deprecated
 	}
-	
-	// Cleanly serialize our array for insertion.
-	$boardStats['post_id_array']   = str_replace( "\"", "\\\"", serialize( $boardStats['post_id_array'] ) );
-	$boardStats['author_ip_array'] = str_replace( "\"", "\\\"", serialize( $boardStats['author_ip_array'] ) );
-	
 	
 	// Insert this data into our statistics table.
 	$statsInsert = "VALUES(\"{$boardStats['stat_uri']}\", \"{$boardStats['stat_hour']}\", \"{$boardStats['post_count']}\", \"{$boardStats['post_id_array']}\", \"{$boardStats['author_ip_count']}\", \"{$boardStats['author_ip_array']}\" )";
@@ -1645,9 +1630,7 @@ function updateStatisticsForPost( $post, $new = true ) {
 	$postStatQuery->execute() or error(db_error($postStatQuery));
 	
 	// Update the posts_total tracker on the board.
-	if ($new) {
-		query("UPDATE ``boards`` SET `posts_total`=`posts_total`+1 WHERE `uri`=\"{$postUri}\"");
-	}
+	query("UPDATE ``boards`` SET `posts_total`=`posts_total`+1 WHERE `uri`=\"{$postUri}\"");
 	
 	return 0; 
 }
