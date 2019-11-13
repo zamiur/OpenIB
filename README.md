@@ -3,7 +3,7 @@ OpenIB
 
 About
 ------------
-OpenIB is a fork of Infinity which is a fork of vichan. OpenIB will be a security fork focused on user security. Infinity offered us board creation ontop of vichan. Now OpenIB will be refactoring Infinity and making the imageboard ecosystem safer for users. A running instance is at [8ch.net](https://8ch.net/) 
+OpenIB is a fork of Infinity which is a fork of vichan. OpenIB will be a security fork focused on user security. Infinity offered us board creation ontop of vichan. Now OpenIB will be refactoring Infinity and making the imageboard ecosystem safer for users. A running instance is at [8kun.net](https://8kun.net/) 
 
 Due to being a recent fork, we have not yet deviated much from Infinity.
 
